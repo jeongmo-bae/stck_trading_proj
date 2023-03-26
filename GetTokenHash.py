@@ -14,8 +14,24 @@ def get_Access_Token(appKey ,appSecret , urlBase ):
         res = requests.post(URL, headers=headers, data=json.dumps(body))
         print("access_token_token_expired =", res.json()['access_token_token_expired'])
         # token 값 저장
-        ACCESS_TOKEN = res.json()["access_token"]
-        return ACCESS_TOKEN
+        accessToken = res.json()["access_token"]
+        return accessToken
+
+
+#revoke accessToken!!!
+def revoke_Access_Token(appKey ,appSecret, accessToken  , urlBase ):
+        
+        headers = {"content-type":"application/json"}
+        body =  { "appkey" : appKey, 
+                "appsecret" : appSecret, 
+                "token" : accessToken 
+                }
+        PATH = "/oauth2/revokeP"
+        URL = f"{urlBase}/{PATH}"
+        
+        res = requests.post(URL,headers = headers, data = json.dumps(body))
+        print(res.json()['message'])
+        return res.json()['code']
     
     
 #HashKey Request!!!
