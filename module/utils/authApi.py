@@ -1,28 +1,23 @@
 import requests
 import json
-from dotenv import dotenv_values
+from ..config import Config
 
-class appInfo :
-    def __init__(self):
-        env = dotenv_values(f'API.env')
-        ### 모의투자서비스
-        self.APP_KEY_M = env[f'APP_KEY_M']
-        self.APP_SECRET_M = env[f'APP_SECRET_M']
-        self.URL_BASE_M = env[f'URL_BASE_M']
-        ###실전투자서비스
-        self.APP_KEY_S = env[f'APP_KEY_M']
-        self.APP_SECRET_S = env[f'APP_SECRET_S']
-        self.URL_BASE_S = env[f'URL_BASE_S']   
-
-    def get_Access_Token(self,appKey ,appSecret , urlBase ):
+class AppInfo(Config) :
+    def __init__(self,user='BJM001',environments = 'dev') :
+        Config.__init__(self,user,environments)
+        
+#    def __all__(self):
+#        return ['get_Access_Token','revoke_Access_Token','get_Hashkey',]
+    
+    def get_Access_Token(self):
         headers = {"content-type":"application/json"}
         body = {
             "grant_type":"client_credentials",
-            "appkey":appKey, 
-            "appsecret":appSecret
+            "appkey":self.API_KEY, 
+            "appsecret":self.API_SECRET
         }
         PATH = "oauth2/tokenP"
-        URL = f"{urlBase}/{PATH}"
+        URL = f"{self.API_BASE_URL}/{PATH}"
 
         # access_token(보안인증키) POST(request)
         res = requests.post(URL, headers=headers, data=json.dumps(body))
@@ -33,15 +28,15 @@ class appInfo :
 
 
     #revoke accessToken!!!
-    def revoke_Access_Token(self,appKey ,appSecret, accessToken  , urlBase ):
+    def revoke_Access_Token(self, accessToken ):
         headers = {"content-type":"application/json"}
         body = {
-            "appkey" : appKey, 
-            "appsecret" : appSecret, 
+            "appkey" : self.API_KEY, 
+            "appsecret" : self.API_SECRET, 
             "token" : accessToken
         }
         PATH = "/oauth2/revokeP"
-        URL = f"{urlBase}/{PATH}"
+        URL = f"{self.API_BASE_URL}/{PATH}"
         
         res = requests.post(URL,headers = headers, data = json.dumps(body))
         print(res.json()['message'])
@@ -49,16 +44,21 @@ class appInfo :
 
 
     #HashKey Request!!!
-    def get_Hashkey(self,datas,appKey ,appSecret , urlBase ):
+    def get_Hashkey(self,datas):
         PATH = "uapi/hashkey"  # hashkey 경로
-        URL = f"{urlBase}/{PATH}"
+        URL = f"{self.API_BASE_URL}/{PATH}"
         headers = {
             'content-Type' : 'application/json',
-            'appKey' : appKey,
-            'appSecret' : appSecret,
+            'appKey' : self.API_KEY,
+            'appSecret' :  self.API_SECRET,
         }
         res = requests.post(URL, headers=headers, data=json.dumps(datas))
         hashkey = res.json()["HASH"]  
         #토큰 발급을 제외한 대부분의 POST 요청에는 해쉬키(Hashkey) 사용이 필수
 
         return hashkey	
+    
+
+__all__=[
+    'AppInfo',
+]

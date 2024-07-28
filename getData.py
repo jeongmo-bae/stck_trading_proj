@@ -1,6 +1,6 @@
 import requests
 import json
-from module.authAPI import *
+from .module.utils.authAPI import *
 
 aif = appInfo()
 accessToken = aif.get_Access_Token(aif.APP_KEY_M, aif.APP_SECRET_M, aif.URL_BASE_M)
